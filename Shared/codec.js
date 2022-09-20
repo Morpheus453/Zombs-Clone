@@ -48,9 +48,9 @@ export class Codec {
                 if (!packetMaps[message.type]) throw `ERROR: Type ${message.type} is not in map`;
 
                 let valid = this.validateParams(packets[message.type], message.options);
+                
+                if (!valid) return;
             }
-
-            if (!valid) return;
 
             return msgpack.encode(message);
         } catch (error) {
