@@ -39,10 +39,17 @@ class GameServer {
         for (let i = 0; i < this.clients.length; i++) {
             // Checking is set to false for performance
 
+            let visible = this.world.getInSight(this.clients[i]);
+            let output = []
+
+            for (let j = 0; j < visible.length; j++) {
+                output.push(this.world.entities.get(visible[j]).clientInfo());
+            }
+
             this.clients[i].send({
                 type: 2,
                 options: {
-                    entities: this.world.getInSight(this.clients[i].id),
+                    entities: output,
                 }
             });
         }
