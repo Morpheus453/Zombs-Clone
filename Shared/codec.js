@@ -1,11 +1,8 @@
-import { packetMaps } from "./packetMaps.js";
-import { packets } from "./packets.js"
-import * as msgpack from "msgpack-lite";
+const packetMaps = require("./packetMaps.js");
+const packets = require("./packets.js");
+const msgpack = require("msgpack-lite");
 
-// Uses msgpack for the actual encoding/decoding, codec is just a class that brings everything together
-// And makes it easier to debug
-
-export class Codec {
+module.exports = class Codec {
     constructor () {
 
     }
@@ -48,7 +45,7 @@ export class Codec {
                 if (!packetMaps[message.type]) throw `ERROR: Type ${message.type} is not in map`;
 
                 let valid = this.validateParams(packets[message.type], message.options);
-                
+
                 if (!valid) return;
             }
 
