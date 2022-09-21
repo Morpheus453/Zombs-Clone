@@ -1,30 +1,36 @@
-const { Client } = require("./Network/Client.js");
-const { Codec } = require("../Shared/codec.js");
+const Client = require("./Network/Client.js");
+const Codec = require("../Shared/codec.js");
+const World = require("./World/World.js");
 
 const codec = new Codec();
 
 class GameServer {
     constructor () {
         this.clients = [];
+        this.world = new World();
+
+        this.TICK_RATE = 50;
+
+        // Stuff for calculating delta time
+
+        this.lastUpdated = Date.now();
+
+        // Start server ticking
+
+        setInterval(this.tick.bind(this), this.TICK_RATE);
     }
 
-    broadcast (msg) {
-        // Encode the message before sending it that way it doesn't have to encode the same
-        // Message over and over again 
+    tick () {
+        let now = Date.now();
+        let dt = now - this.lastUpdated;
 
-        msg = codec.encode(msg);
+        this.world.update(dt);
 
-        for (let i = 0; i < this.clients.length; i++) {
-            this.clients[i].websocket.send(msg);
-        }
+        this.lastUpdated = now;
     }
 
     addClient (socket) {
         this.clients.push(new Client(this, socket));
-    }
-
-    addEntity (eid, client) {
-        // TODO
     }
 }
 
