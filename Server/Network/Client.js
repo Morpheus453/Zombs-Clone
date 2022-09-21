@@ -1,17 +1,15 @@
-const { Codec } = require("../Shared/codec.js");
-const { packetMaps } = require("../../Shared/packetMaps.js");
+const Codec  = require("../../Shared/codec.js");
+const packetMaps = require("../../Shared/packetMaps");
 
+console.log(Codec);
 const codec = new Codec();
 
-export class Client {
+module.exports = class Client {
     constructor (server, websocket) {
         this.gameServer = server;
         this.websocket = websocket;
 
-        // eid is short for entity id, it's separate since the actual entity for the player is stored separately
-
         this.id = Math.floor(Math.random() * Date.now());
-        this.eid = Math.floor(Math.random() * Date.now());
 
         this.name = "Player";
 
@@ -28,6 +26,10 @@ export class Client {
         this.websocket.send(this.codec.encode(msg));
     }
 
+    onClose () {
+        
+    }
+
     onMessage (msg) {
         msg = codec.decode(msg);
 
@@ -42,6 +44,6 @@ export class Client {
         if (!params.name || typeof params.name != 'string') return;
 
         this.name = params.name;
-        this.gameServer.addEntity(this.eid, this);
+        this.gameServer.world.addPlayer(this);
     }
 }
