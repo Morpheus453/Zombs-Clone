@@ -6,11 +6,15 @@ module.exports = class World {
         // Entities are stored as a map so that it's easy to iterate and query
         this.entities = new Map();
 
-        // Bytebuffer has issues with sending a map over the ws so we'll have to convert it into an array
-        // I hope it doesn't affect performance too much bc we'll only have to do it
-        // Once per tick but we'll see...
-        
-        this.entitiesAsArray = [];
+        // For now the spacial hash just pushes all of the entity ids into this one object
+        // In the future it will be broken up into different sections so that you can quickly
+        // Find nearby entities without having to loop through every single one
+
+        this.spacialHash = {
+            "0x0": [
+
+            ]
+        }
 
         // World bounds
 
@@ -18,23 +22,37 @@ module.exports = class World {
         this.height = height;
     }
 
+    clearSpacialHash () {
+        // In the future this will loop through every section and clear them
+        this.spacialHash = {
+            "0x0": [
+                
+            ]
+        };
+    }
+
+    updateSpacialHash () {
+        this.clearSpacialHash();
+
+        for (let [id, entity] of this.entities) {
+            this.spacialHash["0x0"].push(id);
+        }
+    }
+
     update (dt) {
         // TODO
-
-        this.entitiesAsArray = Array.from(this.entities);
+        this.updateSpacialHash();
     }
 
     addPlayer (client) {
-        let pos = Vector.create(Math.floor(Math.random() * this.width), Math.floor(Math.random() * this.height));
-
-        this.entities.set(client.id, new Circle(pos, 25));
+        this.entities.set(client.id, new Circle("player", client.id, this, 25));
 
         console.log(this.entities.get(client.id));
     }
 
-    getInSight (entityID) {
+    getInSight (client) {
         // For now it just returns all entities for testing
 
-        return this.entitiesAsArray;
+        return this.spacialHash["0x0"];
     }
 }
